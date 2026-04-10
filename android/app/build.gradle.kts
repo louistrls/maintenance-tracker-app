@@ -7,8 +7,8 @@ plugins {
 
 android {
     namespace = "com.example.maintenance_app"
-    compileSdk = 35  // ✅ CHANGED: Use explicit version instead of flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 36  // ✅ CHANGED: Use explicit version instead of flutter.compileSdkVersion
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
