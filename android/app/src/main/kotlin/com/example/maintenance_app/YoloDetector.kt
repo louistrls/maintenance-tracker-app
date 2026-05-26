@@ -8,8 +8,20 @@ import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
+import timber.log.Timber // <-- AJOUT : Import de Timber pour les logs
 import java.io.FileInputStream
 import java.nio.channels.FileChannel
+
+// AJOUT : Sortie de la data class pour la rendre accessible par l'ArModelViewerActivity
+// Data class to cleanly store a bounding box
+data class Detection(
+    val left: Float,
+    val top: Float,
+    val right: Float,
+    val bottom: Float,
+    val score: Float,
+    val classIndex: Int
+)
 
 class YoloDetector(context: Context, modelPath: String) {
 
@@ -42,7 +54,8 @@ class YoloDetector(context: Context, modelPath: String) {
             .build()
     }
 
-    fun detect(bitmap: Bitmap) {
+    // AJOUT : Déclaration du type de retour -> List<Detection>
+    fun detect(bitmap: Bitmap): List<Detection> {
         // --- STEP A: IMAGE PREPARATION ---
         var tensorImage = TensorImage(DataType.FLOAT32)
         tensorImage.load(bitmap)
@@ -58,7 +71,112 @@ class YoloDetector(context: Context, modelPath: String) {
         // Feed the image to the model; it populates "outputArray" with its predictions
         interpreter.run(tensorImage.buffer, outputArray)
 
-        // TODO: NMS (Non-Maximum Suppression) algorithm goes here!
+        // --- STEP D: POST-PROCESSING AND NMS ---
+
+        // 1. Filtering parameters (adjust according to your needs)
+        val confidenceThreshold = 0.4f // The model must be at least 40% confident
+        val iouThreshold = 0.5f // If two boxes overlap by more than 50%, we only keep one
+
+        // The output dimensions are [1][9][8400]
+        // We logically transpose it to read column by column (the 8400 predictions)
+        val numPredictions = 8400
+        val numElements = 9 // 4 (x, y, w, h) + 5 classes
+
+        val rawPredictions = outputArray[0]
+        val validDetections = mutableListOf<Detection>()
+
+        // 2. Filtering by confidence score
+        for (i in 0 until numPredictions) {
+            // Find the class with the highest score for this box
+            var maxScore = -1f
+            var classIndex = -1
+
+            // Class scores start at index 4
+            for (c in 4 until numElements) {
+                val score = rawPredictions[c][i]
+                if (score > maxScore) {
+                    maxScore = score
+                    classIndex = c - 4
+                }
+            }
+
+            // If the best score exceeds our threshold, we keep this box
+            if (maxScore >= confidenceThreshold) {
+                // YOLOv8 outputs: center_x, center_y, width, height
+                val cx = rawPredictions[0][i]
+                val cy = rawPredictions[1][i]
+                val w = rawPredictions[2][i]
+                val h = rawPredictions[3][i]
+
+                // Convert to standard format (left, top, right, bottom)
+                val left = cx - w / 2
+                val top = cy - h / 2
+                val right = cx + w / 2
+                val bottom = cy + h / 2
+
+                validDetections.add(
+                    Detection(
+                        left = left,
+                        top = top,
+                        right = right,
+                        bottom = bottom,
+                        score = maxScore,
+                        classIndex = classIndex
+                    )
+                )
+            }
+        }
+
+        // 3. NMS (Non-Maximum Suppression) Algorithm
+        // Sort detections by descending score
+        validDetections.sortByDescending { it.score }
+
+        val finalDetections = mutableListOf<Detection>()
+        val active = BooleanArray(validDetections.size) { true }
+
+        for (i in validDetections.indices) {
+            if (!active[i]) continue
+
+            val detA = validDetections[i]
+            finalDetections.add(detA)
+
+            // Compare with all subsequent boxes (lower confidence)
+            for (j in i + 1 until validDetections.size) {
+                if (!active[j]) continue
+
+                val detB = validDetections[j]
+
+                // If it's the same class, we check the overlap (IoU)
+                if (detA.classIndex == detB.classIndex) {
+                    if (calculateIoU(detA, detB) > iouThreshold) {
+                        active[j] = false // We remove box B as it overlaps too much with box A
+                    }
+                }
+            }
+        }
+
+        // 4. (Optional for now) Print results to the console for verification
+        finalDetections.forEach {
+            Timber.tag("YOLO_TEST").d("Found class ${it.classIndex} with confidence ${it.score} at coords: ${it.left}, ${it.top}")
+        }
+
+        // AJOUT : Retourner les détections à l'application
+        return finalDetections
+    }
+
+    // AJOUT : Private pour cacher cette logique interne au reste de l'application
+    // Mathematical function to calculate the overlap between two boxes (Intersection over Union)
+    private fun calculateIoU(a: Detection, b: Detection): Float {
+        val x1 = maxOf(a.left, b.left)
+        val y1 = maxOf(a.top, b.top)
+        val x2 = minOf(a.right, b.right)
+        val y2 = minOf(a.bottom, b.bottom)
+
+        val intersectionArea = maxOf(0f, x2 - x1) * maxOf(0f, y2 - y1)
+        val boxAArea = (a.right - a.left) * (a.bottom - a.top)
+        val boxBArea = (b.right - b.left) * (b.bottom - b.top)
+
+        return intersectionArea / (boxAArea + boxBArea - intersectionArea)
     }
 
     // Essential function to prevent memory leaks when exiting the camera view
