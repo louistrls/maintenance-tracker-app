@@ -137,4 +137,11 @@ dependencies {
 
     // ✅ ADDED: Optional logging for debugging
     implementation("com.jakewharton.timber:timber:5.0.1")
+
+    // LOUIS TREELS
+    // TensorFlow Lite base engine
+    implementation("org.tensorflow:tensorflow-lite:2.14.0")
+    implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
+    implementation("org.tensorflow:tensorflow-lite-gpu:2.14.0")
+
 }
