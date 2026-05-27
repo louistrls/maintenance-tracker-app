@@ -8,11 +8,10 @@ import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
-import timber.log.Timber // <-- AJOUT : Import de Timber pour les logs
+import timber.log.Timber
 import java.io.FileInputStream
 import java.nio.channels.FileChannel
 
-// AJOUT : Sortie de la data class pour la rendre accessible par l'ArModelViewerActivity
 // Data class to cleanly store a bounding box
 data class Detection(
     val left: Float,
@@ -54,12 +53,11 @@ class YoloDetector(context: Context, modelPath: String) {
             .build()
     }
 
-    // AJOUT : Déclaration du type de retour -> List<Detection>
     fun detect(bitmap: Bitmap): List<Detection> {
         // --- STEP A: IMAGE PREPARATION ---
         var tensorImage = TensorImage(DataType.FLOAT32)
         tensorImage.load(bitmap)
-        tensorImage = imageProcessor.process(tensorImage) // Resizes and normalizes
+        tensorImage = imageProcessor.process(tensorImage)
 
         // --- STEP B: OUTPUT PREPARATION ---
         // Output Type: TensorSpec(shape=(1, 9, 8400))
@@ -164,8 +162,7 @@ class YoloDetector(context: Context, modelPath: String) {
         return finalDetections
     }
 
-    // AJOUT : Private pour cacher cette logique interne au reste de l'application
-    // Mathematical function to calculate the overlap between two boxes (Intersection over Union)
+    // Mathematical function to calculate the overlap between two boxes (IoU threshold)
     private fun calculateIoU(a: Detection, b: Detection): Float {
         val x1 = maxOf(a.left, b.left)
         val y1 = maxOf(a.top, b.top)
