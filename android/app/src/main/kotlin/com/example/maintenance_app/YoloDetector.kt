@@ -158,7 +158,6 @@ class YoloDetector(context: Context, modelPath: String) {
             Timber.tag("YOLO_TEST").d("Found class ${it.classIndex} with confidence ${it.score} at coords: ${it.left}, ${it.top}")
         }
 
-        // AJOUT : Retourner les détections à l'application
         return finalDetections
     }
 
