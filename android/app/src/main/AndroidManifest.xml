@@ -17,7 +17,8 @@
     <application
         android:label="maintenance_app"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
 
         <!-- ARCore metadata - using tools:replace to override library's optional setting -->
         <meta-data
