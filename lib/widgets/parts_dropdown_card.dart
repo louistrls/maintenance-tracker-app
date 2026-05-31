@@ -483,23 +483,35 @@ class PartsDropdownCardState extends State<PartsDropdownCard> with TickerProvide
     }
   }
 
-  // Méthode pour lancer une URL
+  // Méthode pour lancer une URL avec notre schéma personnalisé
   Future<void> _launchUrl(String url) async {
     try {
-      final uri = Uri.parse(url);
+      String customUrl = url.replaceFirst('http', 'cmms');
+      final uri = Uri.parse(customUrl);
+
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri);
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Unable to open the URL: $url'),
+              content: Text('Unable to open the URL: $customUrl'),
               backgroundColor: Colors.red,
             ),
           );
         }
       }
     } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error while opening the URL: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

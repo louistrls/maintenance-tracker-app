@@ -14,6 +14,13 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="cmms" />
+        </intent>
+    </queries>
+
     <application
         android:label="maintenance_app"
         android:name="${applicationName}"
@@ -49,12 +56,20 @@
         <activity
             android:name=".ArModelViewerActivity"
             android:configChanges="orientation|screenSize"
-            android:exported="false"
+            android:exported="true"
             android:screenOrientation="locked"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
-        <meta-data
-            android:name="flutterEmbedding"
-            android:value="2" />
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="cmms"
+                    android:host="10.0.2.2"
+                    android:port="8069"
+                    android:pathPrefix="/web/cmms/viewer" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>
