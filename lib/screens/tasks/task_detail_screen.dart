@@ -990,19 +990,20 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
     );
   }
 
-  /// Méthode pour lancer une URL
+  /// Méthode pour lancer une URL avec notre schéma personnalisé
   Future<void> _launchUrl(String url) async {
     try {
-      final uri = Uri.parse(url);
+      String customUrl = url.replaceFirst('http', 'cmms');
+      final uri = Uri.parse(customUrl);
+
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri);
       } else {
-        _showErrorSnackBar('Unable to launch URL: $url');
+        _showErrorSnackBar('Unable to launch URL: $customUrl');
       }
     } catch (e) {
       _showErrorSnackBar('Error while opening the URL: ${e.toString()}');
     }
   }
-}
 
 
