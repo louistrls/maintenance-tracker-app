@@ -58,9 +58,10 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
-    _slideAnimation = Tween<Offset>(begin: Offset(0, 0.3), end: Offset.zero).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
+    _slideAnimation =
+        Tween<Offset>(begin: Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     // Charger les données
     _initializeData();
@@ -97,13 +98,15 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
     // Auto-complétion : passer en "Completed" si toutes les pièces sont cochées
     if (allChecked && _selectedStatus != AppConstants.STATUS_COMPLETED) {
       _updateTaskStatus(AppConstants.STATUS_COMPLETED);
-      _showSuccessSnackBar('✅ Task automatically completed - all parts checked!');
+      _showSuccessSnackBar(
+          '✅ Task automatically completed - all parts checked!');
     }
     // Retour en arrière : si une pièce est décochée et que la tâche était complétée
     else if (!allChecked && _selectedStatus == AppConstants.STATUS_COMPLETED) {
       // Revenir au statut "In Progress" par défaut
       _updateTaskStatus(AppConstants.STATUS_IN_PROGRESS);
-      _showInfoSnackBar('Task status changed to In Progress - not all parts completed');
+      _showInfoSnackBar(
+          'Task status changed to In Progress - not all parts completed');
     }
   }
 
@@ -144,7 +147,8 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
 
-      final completeTask = await _offlineManager.getCompleteTask(authService, widget.task.id);
+      final completeTask = await _offlineManager.getCompleteTask(
+          authService, widget.task.id);
 
       if (completeTask != null && mounted) {
         setState(() {
@@ -161,7 +165,8 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
       _loadFallbackData();
 
       if (mounted) {
-        _showErrorSnackBar('Unable to retrieve all data. Cached data may be outdated.');
+        _showErrorSnackBar(
+            'Unable to retrieve all data. Cached data may be outdated.');
       }
     } finally {
       if (mounted) {
@@ -213,7 +218,8 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
         }
 
         final updateData = {'stage_id': newStatus};
-        final response = await apiService.updateMaintenanceRequest(widget.task.id, updateData);
+        final response = await apiService.updateMaintenanceRequest(
+            widget.task.id, updateData);
 
         if (response != null && response['success'] == true) {
           setState(() {
@@ -264,7 +270,8 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
             margin: EdgeInsets.only(right: 16),
             child: Icon(
               _offlineManager.isOnline ? Icons.cloud_done : Icons.cloud_off,
-              color: _offlineManager.isOnline ? Colors.white : Colors.orange.shade200,
+              color: _offlineManager.isOnline ? Colors.white : Colors.orange
+                  .shade200,
             ),
           ),
           // Bouton de rafraîchissement
@@ -317,7 +324,10 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
                   SizedBox(height: 16),
                   Builder(
                     builder: (context) {
-                      final screenWidth = MediaQuery.of(context).size.width;
+                      final screenWidth = MediaQuery
+                          .of(context)
+                          .size
+                          .width;
                       // Seuil typique pour mobile : < 600px
                       if (screenWidth < 600) {
                         // Affichage en colonne (l'une sous l'autre)
@@ -370,7 +380,8 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
   // ... Le reste du code reste identique aux méthodes existantes ...
 
   /// Construction du header avec informations principales
-  Widget _buildHeader(MaintenanceTask task, Color statusColor, IconData statusIcon) {
+  Widget _buildHeader(MaintenanceTask task, Color statusColor,
+      IconData statusIcon) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(20),
@@ -419,12 +430,14 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
                     SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.location_on, color: Colors.white70, size: 16),
+                        Icon(
+                            Icons.location_on, color: Colors.white70, size: 16),
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             task.location,
-                            style: TextStyle(color: Colors.white70, fontSize: 14),
+                            style: TextStyle(color: Colors.white70,
+                                fontSize: 14),
                           ),
                         ),
                       ],
@@ -440,7 +453,8 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
               Icon(Icons.access_time, color: Colors.white70, size: 16),
               SizedBox(width: 4),
               Text(
-                'Programmed: ${DateFormat('dd/MM/yyyy HH:mm').format(task.scheduledDate)}',
+                'Programmed: ${DateFormat('dd/MM/yyyy HH:mm').format(
+                    task.scheduledDate)}',
                 style: TextStyle(color: Colors.white70, fontSize: 12),
               ),
             ],
@@ -483,10 +497,15 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
               spacing: 8,
               runSpacing: 8,
               children: [
-                _buildStatusButton(AppConstants.STATUS_PENDING, 'Pending', Colors.orange),
-                _buildStatusButton(AppConstants.STATUS_IN_PROGRESS, 'In progress', Colors.blue),
-                _buildStatusButton(AppConstants.STATUS_COMPLETED, 'Completed', Colors.green),
-                _buildStatusButton(AppConstants.STATUS_CANCELLED, 'Rebuttal', Colors.red),
+                _buildStatusButton(
+                    AppConstants.STATUS_PENDING, 'Pending', Colors.orange),
+                _buildStatusButton(
+                    AppConstants.STATUS_IN_PROGRESS, 'In progress',
+                    Colors.blue),
+                _buildStatusButton(
+                    AppConstants.STATUS_COMPLETED, 'Completed', Colors.green),
+                _buildStatusButton(
+                    AppConstants.STATUS_CANCELLED, 'Rebuttal', Colors.red),
               ],
             ),
           ],
@@ -520,7 +539,8 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
     );
   }
 
-  Widget _buildInfoCard(String title, String value, IconData icon, Color color) {
+  Widget _buildInfoCard(String title, String value, IconData icon,
+      Color color) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 2,
@@ -705,7 +725,8 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
                   SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.category, size: 16, color: Colors.grey.shade600),
+                      Icon(Icons.category, size: 16,
+                          color: Colors.grey.shade600),
                       SizedBox(width: 4),
                       Text(
                         'Category: ${_equipment!.category}',
@@ -716,7 +737,8 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
                   SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.location_on, size: 16, color: Colors.grey.shade600),
+                      Icon(Icons.location_on, size: 16,
+                          color: Colors.grey.shade600),
                       SizedBox(width: 4),
                       Text(
                         'Emplacement: ${_equipment!.location}',
@@ -724,10 +746,12 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
                       ),
                     ],
                   ),
-                  if (_equipment!.model3dViewerUrl != null && _equipment!.model3dViewerUrl!.isNotEmpty) ...[
+                  if (_equipment!.model3dViewerUrl != null &&
+                      _equipment!.model3dViewerUrl!.isNotEmpty) ...[
                     SizedBox(height: 12),
                     ElevatedButton.icon(
-                      onPressed: () => _launchUrl(_equipment!.model3dViewerUrl!),
+                      onPressed: () =>
+                          _launchUrl(_equipment!.model3dViewerUrl!),
                       icon: Icon(Icons.view_in_ar, size: 18),
                       label: Text('See 3D Model'),
                       style: ElevatedButton.styleFrom(
@@ -795,7 +819,8 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
               children: [
                 Icon(
                   _offlineManager.isOnline ? Icons.cloud_done : Icons.cloud_off,
-                  color: _offlineManager.isOnline ? Colors.green : Colors.orange,
+                  color: _offlineManager.isOnline ? Colors.green : Colors
+                      .orange,
                 ),
                 SizedBox(width: 8),
                 Text(
@@ -813,7 +838,8 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
                   ? 'Connected - All data is synchronized'
                   : 'Offline - Data is cached locally',
               style: TextStyle(
-                color: _offlineManager.isOnline ? Colors.green.shade700 : Colors.orange.shade700,
+                color: _offlineManager.isOnline ? Colors.green.shade700 : Colors
+                    .orange.shade700,
                 fontSize: 14,
               ),
             ),
@@ -1005,5 +1031,5 @@ class TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderS
       _showErrorSnackBar('Error while opening the URL: ${e.toString()}');
     }
   }
-
+}
 

@@ -511,16 +511,6 @@ class PartsDropdownCardState extends State<PartsDropdownCard> with TickerProvide
         );
       }
     }
-  }    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error while opening the URL: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
   }
 }
 
